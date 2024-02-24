@@ -6,7 +6,8 @@ import AuthForm from '@/components/AuthForm'
 function Login() {
   const navigate = useNavigate()
 
-  const [login, setLogin] = useState(false)
+  const [login] = useState(false)
+  const [notValidFields, setNotValidFields] = useState<string[]>([])
   if (login) navigate('/')
 
   const handleLogin = (e: FormEvent<HTMLFormElement>) => {
@@ -14,8 +15,16 @@ function Login() {
     if (!(e.target instanceof HTMLFormElement)) return // Typescript safety; otherwise typescript will scream
     const form = new FormData(e.target)
     const values = Object.fromEntries(form.entries())
+
+    const unValidFields = [] as string[]
+    Object.entries(values).forEach(([key, value]) => {
+      if (!value) unValidFields.push(key)
+    })
+    setNotValidFields(unValidFields)
+    if (unValidFields.length) return
+
     console.log('Values: ', values)
-    setLogin(true)
+    // setLogin(true)
   }
 
   return (
@@ -33,6 +42,7 @@ function Login() {
             name='username'
             margin='normal'
             variant='outlined'
+            error={notValidFields?.includes('username')}
           />
           <TextField
             required
@@ -41,6 +51,7 @@ function Login() {
             name='password'
             margin='normal'
             variant='outlined'
+            error={notValidFields?.includes('password')}
           />
           <Button
             fullWidth
